@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         mNumberPicker.setOnValueChangedListener(onValueChangeListener);
 
+        //Подключение плеера
         IcyHttpDataSourceFactory factory = new IcyHttpDataSourceFactory.Builder(Util.getUserAgent(this, getResources().getString(R.string.app_name)))
                 .setIcyHeadersListener(new IcyHttpDataSource.IcyHeadersListener() {
                     @Override
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 (Uri.parse("http://cdn.pifm.ru/mp3"), dataSourceFactory, new DefaultExtractorsFactory(), new Handler(), null);
         player_audio.prepare(audioSource);
 
+        //листенер кнопки - если сейчас не проигрывается включить и наоборот
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             }
         });
 
-        player_audio.addListener(new ExoPlayer.EventListener() {
+        player_audio.addListener(new ExoPlayer.EventListener() { //листенер плеера
 
 
             @Override
@@ -157,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
 
 
-    NumberPicker.OnValueChangeListener onValueChangeListener =
+    NumberPicker.OnValueChangeListener onValueChangeListener = //листенер Picker-а
+            //вставить URL потока взависимости от того какой элемент выбран
             new 	NumberPicker.OnValueChangeListener(){
                 @Override
                 public void onValueChange(NumberPicker numberPicker, int i, int i1) {
@@ -169,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                                     new Handler(), null);
                     player_audio.prepare(audioSource);
                     player_audio.setPlayWhenReady(true);
-                    if (!play_audio) {
+                    if (!play_audio) { //выключить воспроизведение если плеер выключен сейчас - без этого после перехода музыка начинает играть
                         player_audio.setPlayWhenReady(false);
                     }
                 }
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
 
     @Override
-    public void play() {
+    public void play() { //вызывается презентером - поменять картинку на кнопке и кключить воспроизведение музыки
         Log.d(TAG, "play");
         play_audio = true;
         player_audio.prepare(audioSource);
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed() { //при нажатии back - выключить воспроизведение музыки
         super.onBackPressed();
         player_audio.setPlayWhenReady(false);
     }
