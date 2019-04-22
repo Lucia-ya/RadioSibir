@@ -39,6 +39,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     private static final String TAG = "MainActivity";
     private static boolean play_audio = false;
     private DefaultDataSourceFactory dataSourceFactory;
+    private IcyHttpDataSourceFactory factory;
+    private DefaultBandwidthMeter bandwidthMeter;
+    private TrackSelection.Factory videoTrackSelectionFactory;
+    private TrackSelector trackSelector;
+
     private ExtractorMediaSource audioSource;
     private String[] data = new String[]{"Омск, 103,9 FM", "Красноярск, 95,8 FM", "Томск, 104,6 FM", "Улан Удэ, 106,5 FM", "Чита, 102,6 FM"};
     private String[] uriArr = new String[]{"http://176.120.25.59:8090/omsk2",
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         mNumberPicker.setOnValueChangedListener(onValueChangeListener);
 
         //Подключение плеера
-        IcyHttpDataSourceFactory factory = new IcyHttpDataSourceFactory.Builder(Util.getUserAgent(this, getResources().getString(R.string.app_name)))
+        factory = new IcyHttpDataSourceFactory.Builder(Util.getUserAgent(this, getResources().getString(R.string.app_name)))
                 .setIcyHeadersListener(new IcyHttpDataSource.IcyHeadersListener() {
                     @Override
                     public void onIcyHeaders(IcyHttpDataSource.IcyHeaders icyHeaders) {
@@ -76,16 +81,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                     }
                 }).build();
 
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
+        bandwidthMeter = new DefaultBandwidthMeter(); //test
+        videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        trackSelector =
                 new DefaultTrackSelector(videoTrackSelectionFactory);
         player_audio = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
 
         dataSourceFactory = new DefaultDataSourceFactory(getApplicationContext(), null, factory);
 
         audioSource = new ExtractorMediaSource
-                (Uri.parse("http://cdn.pifm.ru/mp3"), dataSourceFactory, new DefaultExtractorsFactory(), new Handler(), null);
+                (Uri.parse(uriArr[0]), dataSourceFactory, new DefaultExtractorsFactory(), new Handler(), null);
         player_audio.prepare(audioSource);
 
         //листенер кнопки - если сейчас не проигрывается включить и наоборот
@@ -164,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             new 	NumberPicker.OnValueChangeListener(){
                 @Override
                 public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-
                     Log.d(TAG, "PickerListener value: " +  String.valueOf(i));
                     Log.d(TAG, "Pred valaue: " + String.valueOf(i1));
                     audioSource = new ExtractorMediaSource
@@ -198,7 +202,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onBackPressed() { //при нажатии back - выключить воспроизведение музыки
+        if (player_audio != null) {
+            mPresenter.onPauseBtnClicked();
+            // save the player state before releasing its resources
+            player_audio.release();
+            player_audio = null;
+        }
         super.onBackPressed();
-        player_audio.setPlayWhenReady(false);
     }
+
+
 }
