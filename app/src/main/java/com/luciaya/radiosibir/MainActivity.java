@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     private ExtractorMediaSource audioSource;
     private String[] data = new String[]{"Омск, 103,9 FM", "Красноярск, 95,8 FM", "Томск, 104,6 FM", "Улан Удэ, 106,5 FM", "Чита, 102,6 FM"};
-    private String[] uriArr = new String[]{"http://176.120.25.59:8090/omsk2",
+    private String[] uriArr = new String[]{"http://176.120.25.59:8090/omsk3",
             "http://prepros.pifm.ru/kr", "http://stream.radiosibir.ru:8090/HQ",
             "http://92.124.196.44:8000/radiosibiruu", "http://185.108.196.182:8090/HQ"};
 
